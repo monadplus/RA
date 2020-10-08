@@ -1,0 +1,194 @@
+\documentclass[12pt, a4paper]{article} % book, report, article, letter, slides
+                                       % letterpaper/a4paper, 10pt/11pt/12pt, twocolumn/twoside/landscape/draft
+
+%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc} % encoding
+
+\usepackage[english]{babel} % use special characters and also translates some elements within the document.
+
+\usepackage{amsmath}        % Math
+\usepackage{amsthm}         % Math, \newtheorem, \proof, etc
+\usepackage{amssymb}        % Math, extended collection
+\usepackage{bm}             % $\bm{D + C}$
+\newtheorem{theorem}{Theorem}[section]     % \begin{theorem}\label{t:label}  \end{theorem}<Paste>
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newenvironment{claim}[1]{\par\noindent\underline{Claim:}\space#1}{}
+\newenvironment{claimproof}[1]{\par\noindent\underline{Proof:}\space#1}{\hfill $\blacksquare$}
+
+\usepackage{hyperref}       % Hyperlinks \url{url} or \href{url}{name}
+
+\usepackage{parskip}        % \par starts on left (not idented)
+
+\usepackage{abstract}       % Abstract
+
+\usepackage{enumitem}       % \item[$ast$] Foo
+
+\usepackage{tocbibind}      % Adds the bibliography to the table of contents (automatically)
+
+\usepackage{graphicx}       % Images
+\graphicspath{{./images/}}
+
+\usepackage[vlined,ruled]{algorithm2e} % pseudo-code
+
+% \usepackage[document]{ragged2e}  % Left-aligned (whole document)
+% \begin{...} ... \end{...}   flushleft, flushright, center
+
+%%%%%%%%%%%%%%%% CODE %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minted}         % Code listing
+% \mint{html}|<h2>Something <b>here</b></h2>|
+% \inputminted{octave}{BitXorMatrix.m}
+
+%\begin{listing}[H]
+  %\begin{minted}[xleftmargin=20pt,linenos,bgcolor=codegray]{haskell}
+  %\end{minted}
+  %\caption{Example of a listing.}
+  %\label{lst:example} % You can reference it by \ref{lst:example}
+%\end{listing}
+
+\newcommand{\code}[1]{\texttt{#1}} % Define \code{foo.hs} environment
+
+%%%%%%%%%%%%%%%% COLOURS %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{xcolor}         % Colours \definecolor, \color{codegray}
+\definecolor{codegray}{rgb}{0.9, 0.9, 0.9}
+% \color{codegray} ... ...
+% \textcolor{red}{easily}
+
+%%%%%%%%%%%%%%%% CONFIG %%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\absnamepos}{flushleft}
+\setlength{\absleftindent}{0pt}
+\setlength{\absrightindent}{0pt}
+
+%%%%%%%%%%%%%%%% GLOSSARIES %%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{glossaries}
+
+%\makeglossaries % before entries
+
+%\newglossaryentry{latex}{
+    %name=latex,
+    %description={Is a mark up language specially suited
+    %for scientific documents}
+%}
+
+% Referene to a glossary \gls{latex}
+% Print glossaries \printglossaries
+
+\usepackage[acronym]{glossaries} %
+
+% \acrshort{name}
+% \acrfull{name}
+\newacronym{kcol}{$k$-COL}{$k$-coloring problem}
+\newacronym{scol}{SEARCH-$k$-COL}{Search $k$-coloring problem}
+\newacronym{2col}{$2$-COL}{$2$-coloring problem}
+\newacronym{e2sat}{$E2$-SAT}{Exactly 2-SAT}
+
+%%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{TODO}
+\lhead{TODO}
+\rfoot{Page \thepage}
+
+%%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%
+
+\title{%
+  Randomized Algorithms\\
+  \large{Assignment 1}
+}
+\author{%
+  Arnau Abella \\
+  \large{Universitat Polit\`ecnica de Catalunya}
+}
+\date{\today}
+
+%%%%%%%%%%%%%%%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+%%%%%%% Exercise 1
+
+\section*{Exercise 1}%
+\label{sec:exercise_1}
+
+\begin{enumerate}[label=(\alph*)]
+  \item Prove that for each of the following hands, the probability of having the hand is the given one:
+    \begin{enumerate}[label=\textbullet]
+      \item Having \textit{four of a kind} (four cards of the same value, the other one does not matter). Prob. = 0.000240096
+
+        For example (K,K,K,K,*). The order does not matter. We pick a card over the 13 possible ranks. Then, there is only one combination to pick three cards of the same value. The last card can be choosen arbitrary from the remaining 48 cards of the deck. The resulting probability is:
+
+        \begin{equation}
+          \frac{13 \cdot 1 \cdot 48}{\binom{52}{5}} = 0.000240096
+        \end{equation}
+
+      \item Having \textit{flush} (five cards of the same suit, not consecutive values). Prob. =0.0019879
+
+        There are 4 possible suits and for each suit we have to choose 5 different cards $\binom{13}{5}$. The resulting probability is:
+
+        \begin{equation}
+          \frac{4 \binom{13}{5}}{\binom{52}{5}} = 0.0019879
+        \end{equation}
+
+      \item Having \textit{straight flush}  (five cards of the same suit with consecutives values). Prob. = 0.0000153908
+
+        The only possible draws for each suit ($4$ in total) are \{A,K,J,Q,10\}, \{K,J,Q,10,9\}, \{J,Q,10,9,8\} , \ldots, \{5,4,3,2,A\}. The resulting probability is:
+
+        \begin{equation}
+          \frac{4 \cdot 10}{\binom{52}{5}} = 0.0000153908
+        \end{equation}
+
+    \end{enumerate}
+  \item Suppose you are playing with 3 other players, and you have a \textit{four of a kind} . What is the probability one of the other players has a better hand (i.e. a straight flush).
+
+    The probability that one the other players do not have a straight flush is $(1 - \frac{40}{\binom{52}{5}})$. The probability that none of them have a straight flush is $(1 - \frac{40}{\binom{52}{5}})^3$. And the probability that at least one of them has a straight flush is $1 - (1 - \frac{40}{\binom{52}{5}})^3$.
+
+    %Let $E_i$ be the event that player $i$ has a straight flush. The probability of one of them having a straight flush is
+
+    %\begin{equation}
+    %\end{equation}
+
+    %\begin{align*}
+      %Pr (\bigcup_{i \geq 1} E_i) &\leq \sum_{i \geq 1} Pr(E_i) = 3 \frac{4 \cdot 10}{\binom{52}{5}}
+    %\end{align*}
+
+\end{enumerate}
+
+
+%%%%%%% Exercise 2
+
+\section*{Exercise 2}%
+\label{sec:exercise_2}
+
+Prove,
+
+\begin{enumerate}[label=(\alph*)]
+  \item This algorithm is one-side, it may output match when there is no match. Prove the $Pr[\textit{output match, when no match}] \leq 1/c$, for suitable $c > 0$.
+  \item  Prove that the algorithm can be implemented in $\mathcal{O}(n + m)$ steps.
+\end{enumerate}
+
+
+%%%%%%% Exercise 3
+
+\section*{Exercise 3}%
+\label{sec:exercise_3}
+
+%%%%%%% Exercise 4
+
+\section*{Exercise 4}%
+\label{sec:exercise_4}
+
+%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
+
+%\bibliographystyle{unsrt} % abbrv, aplha, plain, abstract, apa, unsrt,
+%\bibliography{refs}
+
+\end{document}
