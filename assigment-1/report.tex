@@ -87,6 +87,12 @@
 \newacronym{2col}{$2$-COL}{$2$-coloring problem}
 \newacronym{e2sat}{$E2$-SAT}{Exactly 2-SAT}
 
+%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[displaymath,textmath,sections,graphics,floats]{preview}
+% \PreviewEnvironment{enumerate}
+\PreviewEnvironment{tabular}
+
 %%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{fancyhdr}
@@ -119,12 +125,12 @@
 \section*{Exercise 1}%
 \label{sec:exercise_1}
 
-\begin{enumerate}[label=(\alph*)]
+\begin{enumerate}[label=( \alph*)]
   \item Prove that for each of the following hands, the probability of having the hand is the given one:
     \begin{enumerate}[label=\textbullet]
       \item Having \textit{four of a kind} (four cards of the same value, the other one does not matter). Prob. = 0.000240096
 
-        For example (K,K,K,K,*). The order does not matter. We pick a card over the 13 possible ranks. Then, there is only one combination to pick three cards of the same value. The last card can be choosen arbitrary from the remaining 48 cards of the deck. The resulting probability is:
+        For example (K,K,K,K,*). The order does not matter. We pick a card over the 13 possible ranks. Then, there is only one combination to pick three cards of the same value. The last card can be chosen arbitrary from the remaining 48 cards of the deck. The resulting probability is:
 
         \begin{equation}
           \frac{13 \cdot 1 \cdot 48}{\binom{52}{5}} = 0.000240096
@@ -138,7 +144,7 @@
           \frac{4 \binom{13}{5}}{\binom{52}{5}} = 0.0019879
         \end{equation}
 
-      \item Having \textit{straight flush}  (five cards of the same suit with consecutives values). Prob. = 0.0000153908
+      \item Having \textit{straight flush}  (five cards of the same suit with consecutive values). Prob. = 0.0000153908
 
         The only possible draws for each suit ($4$ in total) are \{A,K,J,Q,10\}, \{K,J,Q,10,9\}, \{J,Q,10,9,8\} , \ldots, \{5,4,3,2,A\}. The resulting probability is:
 
@@ -168,11 +174,70 @@
 \section*{Exercise 2}%
 \label{sec:exercise_2}
 
-Prove,
-
 \begin{enumerate}[label=(\alph*)]
   \item This algorithm is one-side, it may output match when there is no match. Prove the $Pr[\textit{output match, when no match}] \leq 1/c$, for suitable $c > 0$.
+
+    \begin{theorem}
+      There is a constant $c > 0$ such that, with probability $\leq \frac{1}{c}$, the \textit{Karp-Rabin algorithm} reports no false positives.
+    \end{theorem}
+
+    We need two basic facts from number theory to prove this.
+
+    \begin{lemma}\label{lemma:1}
+      Any positive integer $X$ has at most $\log_{2}X$ \textit{distinct prime divisors}.
+    \end{lemma}
+
+    The second fact is the famous Prime Number Theorem.
+
+    \begin{lemma}\label{lemma:2}
+      Let $\pi(Q)$ be the number of primes in $\{2, \ldots, Q\}$. There exists a constant $d > 0$, independent of $Q$, such that for any integer $Q \geq 2, \pi(Q) \geq \frac{d Q}{\ln Q}$.
+    \end{lemma}
+
+    The first lemma can be proven using the Fundamental Theorem of Arithmetic.
+    Proving the second lemma is out of the scope of this homework.
+
+
+    \begin{proof}
+
+      Define $Q = \{q : T(j) \neq S\}$ to be the set set of shifts for which there is no match.
+
+      Define the number
+
+      \begin{equation}\label{eq:4}
+        X = \prod_{q \in Q} |D(T(j)) - D(S)|
+      \end{equation}
+
+      $X$ is a positive integer. Since $|Q| \leq n - m$ and $|D(T(j)) - D(S)| \leq 2^{m}$, we have $X \leq 2^{m(n - m)} \leq 2^{mn}$. By Lemma \ref{lemma:1}, $X$ has \textit{at most} $mn$ prime divisors.
+
+        Notice that we have a false match exactly when there is a shift $q \in Q$ for which $\phi(T(j)) = \phi(S)$, which happens exactly when $p$ divides $|D(T(j)) - D(S)|$. Therefore, if there is any false match, then $p$ would divide $X$. Hence,
+
+        \begin{align*}
+          Pr[output match, when no match]& \\
+          \leq Pr[p divides X] &= \frac{\#\{prime divisors of X\}}{\pi(k)} \\
+                            &\leq  \frac{mn\ln(cmn\ln(mn))}{dcmn\ln(mn)} \\
+                            &= \frac{1}{dc} + \frac{\ln(c)}{dc\ln(mn)} + \frac{\ln\ln(m n)}{dc\ln(mn)}
+        \end{align*}
+
+        Given a large enough c the right hand side can be made less than any fixed constant by basic calculus.
+
+    \end{proof}
+
+
   \item  Prove that the algorithm can be implemented in $\mathcal{O}(n + m)$ steps.
+
+    \begin{itemize}
+        \item Computing $D(S)$ can be done in $m$ steps.
+        \item Finding all primes up to $k$ can be done in $\mathcal{O}(k)$ using the \textit{the sieve of Atkin}. The prime values could be precomputed.
+        \item Computing the $mod$ is constant.
+        \item The for loop does $n - m + 1$ iterations, at most $O(n)$.
+        \begin{itemize}
+          \item Computing $(D(T(j)))$ can be done in $m$ steps. To avoid having to pay $m$ steps at each iteration (in total $O(n \cdot m)$), we can compute $D(T(j)) = D(T(j-1)) - x_{j-1}2^{z} + x_{j+m}2^{i}$  which takes constant time.
+          \item The comparison $\phi(T(j)) = \phi(S)$ is constant
+        \end{itemize}
+    \end{itemize}
+
+    The total number of steps of \textit{Karp-Rabin algorithm} is $\mathcal{O}(n + m)$.
+
 \end{enumerate}
 
 
@@ -188,7 +253,7 @@ Prove,
 
 %%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
 
-%\bibliographystyle{unsrt} % abbrv, aplha, plain, abstract, apa, unsrt,
-%\bibliography{refs}
+% \bibliographystyle{unsrt} % abbrv, aplha, plain, abstract, apa, unsrt,
+% \bibliography{refs}
 
 \end{document}
