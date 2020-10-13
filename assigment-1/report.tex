@@ -98,15 +98,15 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{TODO}
-\lhead{TODO}
+\rhead{Arnau Abella Gassol}
+\lhead{Randomized Algorithms}
 \rfoot{Page \thepage}
 
 %%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%
 
 \title{%
   Randomized Algorithms\\
-  \large{Assignment 1}
+  \large{First Assignment}
 }
 \author{%
   Arnau Abella \\
@@ -156,16 +156,6 @@
   \item Suppose you are playing with 3 other players, and you have a \textit{four of a kind} . What is the probability one of the other players has a better hand (i.e. a straight flush).
 
     The probability that one the other players do not have a straight flush is $(1 - \frac{40}{\binom{52}{5}})$. The probability that none of them have a straight flush is $(1 - \frac{40}{\binom{52}{5}})^3$. And the probability that at least one of them has a straight flush is $1 - (1 - \frac{40}{\binom{52}{5}})^3$.
-
-    %Let $E_i$ be the event that player $i$ has a straight flush. The probability of one of them having a straight flush is
-
-    %\begin{equation}
-    %\end{equation}
-
-    %\begin{align*}
-      %Pr (\bigcup_{i \geq 1} E_i) &\leq \sum_{i \geq 1} Pr(E_i) = 3 \frac{4 \cdot 10}{\binom{52}{5}}
-    %\end{align*}
-
 \end{enumerate}
 
 
@@ -226,30 +216,97 @@
   \item  Prove that the algorithm can be implemented in $\mathcal{O}(n + m)$ steps.
 
     \begin{itemize}
-        \item Computing $D(S)$ can be done in $m$ steps.
         \item Finding all primes up to $k$ can be done in $\mathcal{O}(k)$ using the \textit{the sieve of Atkin}. The prime values could be precomputed.
-        \item Computing the $mod$ is constant.
-        \item The for loop does $n - m + 1$ iterations, at most $O(n)$.
+        \item Computing the fingerprint $\phi(x) = x \mod p$ can be done in constant time assuming p is $O(log n)$ bites long. Then, computing $D(S)$ can be done in $m$ steps. Finally, computing $\phi(D(S))$ can be done in $O(m)$ steps.
+        \item The for loop does $n - m + 1$ iterations and at each iteration it does constant number of operations.
+
         \begin{itemize}
-          \item Computing $(D(T(j)))$ can be done in $m$ steps. To avoid having to pay $m$ steps at each iteration (in total $O(n \cdot m)$), we can compute $D(T(j)) = D(T(j-1)) - x_{j-1}2^{z} + x_{j+m}2^{i}$  which takes constant time.
-          \item The comparison $\phi(T(j)) = \phi(S)$ is constant
+          \item Computing $(D(T(j)))$ can be done in $O(m)$. The obvious total cost is $O(nm)$ but we can compute $\phi(D(T(j)))$ in constant time. Notice $\phi(D(T(j+1)))$ and $\phi(D(T(j)))$ only differ from the first and last term.
+
+            So we can compute ${D(T(j+1)) = 2(D(T(j)) - 2^{m-1}x_{j}) + x_{j + 1}}$ and then compute the fingerprint in constant time.
         \end{itemize}
+
+        The running time of the loop is at most $O(n)$.
     \end{itemize}
 
-    The total number of steps of \textit{Karp-Rabin algorithm} is $\mathcal{O}(n + m)$.
+    The total number of steps of the \textit{Karp-Rabin algorithm} is $\mathcal{O}(n + m)$.
 
 \end{enumerate}
-
 
 %%%%%%% Exercise 3
 
 \section*{Exercise 3}%
 \label{sec:exercise_3}
 
+\begin{algorithm}[H]
+  \SetAlgoNoLine
+  \SetKwInOut{Input}{Input}
+  \SetKwInOut{Output}{Output}
+  \Input{$G = (V, E)$ and $k$ the total number of colors}
+  \Output{$G' = (C, V, E)$ where $c_{i} \in C$ is the color assigned to vertex $v_{i} \in V$ and $|C| = |V|$ and $c \in \{1, \ldots, k\}$}
+  \For{$u \in V$}{
+    \For{$ v \in \{v | edge(u,v) \in E \}$}{
+      \uIf{vertex $v$ has no color assigned yet}{
+        Pick u.a.r a color from $\{1, \ldots, k\}$ and assign it to vertex $v$
+      }
+    }
+  }
+  \caption{Randomized k-COL}                                   
+  \label{algo:k-col}
+\end{algorithm}
+
+It is easy to see that the proposed algorithm \ref{algo:k-col} computes a valid $k$-coloring assignment in polynomial time.
+                                                                                  
+Now, let's have a look at the quality of this assignment. Let $X_{uv}$ be the bernoulli random variable that takes 1 when the edge $(u,v)$ is properly colored, and 0 otherwise. Notice that the edge $(u,v)$ is properly colored when the vertex $u$ has a different color from the vertex $v$. Hence,
+
+\begin{equation*}
+  E[X_{uv}] = Pr[X_{uv} = 1] = Pr[c(u) \neq c(v)] = 1 - \frac{k}{k^{2}}
+\end{equation*}
+
+Let $X$ be the properly colored edges in a graph $G = (E, V)$ of degree $d$ such that $X = \sum_{u \in V}\sum_{v \neq u, (u,v) \in E} X_{uv}$. Then, the expected total number of properly colored edges in a graph satisfies
+
+\begin{align*}
+  E[X] &= E[\sum_{u \in V}\sum_{v \neq u, (u,v) \in E} X_{uv}] \\
+       &= \sum_{u \in V}\sum_{v \neq u, (u,v) \in E} E[X_{uv}] \\
+       &= \sum_{u \in V}\sum_{v \neq u, (u,v) \in E} 1 - \frac{k}{k^{2}} \\
+       &\ge  1 - \frac{k}{k^{2}}
+\end{align*}
+
+In the case of $3$-coloring, the expected number of properly colored edges is $\ge 1 - \frac{3}{3^{2}} = \frac{2}{3}$.
+
 %%%%%%% Exercise 4
 
 \section*{Exercise 4}%
 \label{sec:exercise_4}
+
+Let's analyze the randomized algorithm first and then the deterministic algorithm. Let $X$ be the number of open boxes before getting the winning box. Let $X_{i}$ be the the random variable that takes on the value 1 if the $i$th box is the winning box, and 0 otherwise. Then, the total number of boxes before getting the prize is
+
+\begin{equation*}
+  X = \sum_{i-1}^{n}X_{i}
+\end{equation*}
+
+and
+
+\begin{align*}
+  E[X] &= E[\sum_{i-1}^{n}X_{i}] \\
+       &= \sum_{i-1}^{n}E[X_{i}]
+\end{align*}
+
+by the linearity of expectations.
+
+Since $X_{i}$ is a bernoulli random variable, $E[X_{i}]$ is equal to the probability that $X_{i}$ is $1$.
+Since the boxes are picked uniformly at random from the remaining $n - i$ not opened boxes. the probability of $X_{i} = 1$ is $\frac{1}{n-i+1}$. Finally, the expected number of opened boxes before getting the prize is
+
+\begin{align*}
+  E[X] &= E[\sum_{i-1}^{n}X_{i}] \\
+       &= \sum_{i-1}^{n}E[X_{i}] \\
+       &= \sum_{i-1}^{n} \frac{1}{n-i+1} \\
+       &= H_{n}
+\end{align*}
+
+Recalling that the harmonic number $H_{n}$ satisfies $H_{n} = \ln n + \theta(1)$, we have $E[X] = \ln n + \theta(1)$.
+
+Next, we consider the deterministic algorithm where the input is given at random with probability $\frac{1}{2}$. The algorithm is essentially the same as the randomized version as the box opened at the iteration $i$th is determined by the \textit{random choice} of the sequence of boxes.
 
 %%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
 
