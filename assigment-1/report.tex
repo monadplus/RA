@@ -279,34 +279,36 @@ In the case of $3$-coloring, the expected number of properly colored edges is $\
 \section*{Exercise 4}%
 \label{sec:exercise_4}
 
-Let's analyze the randomized algorithm first and then the deterministic algorithm. Let $X$ be the number of open boxes before getting the winning box. Let $X_{i}$ be the the random variable that takes on the value 1 if the $i$th box is the winning box, and 0 otherwise. Then, the total number of boxes before getting the prize is
+Let's analyze the expected number of boxes before opening the prized box on each strategy and see which one is better.
 
-\begin{equation*}
-  X = \sum_{i-1}^{n}X_{i}
-\end{equation*}
+\begin{itemize}
+  \item The first algorithm:
 
-and
+    \begin{itemize}
+      \item[] Let $X$ be the number of the box holding the money prize.
+      \item[] Let $Z$ be the number of boxes opened so far.
+      \item[] Let $x$ be the result of the coin-flip:
+        \begin{itemize}
+          \item[] If $x = 0$, then the algorithm opens $X$ boxes.
+          \item[] If $x = 1$, then the algorithm opens $(n - X + 1)$ boxes.
+        \end{itemize}
+    \end{itemize}
 
-\begin{align*}
-  E[X] &= E[\sum_{i-1}^{n}X_{i}] \\
-       &= \sum_{i-1}^{n}E[X_{i}]
-\end{align*}
+    The expected number of opened boxes before reaching the prized one is $E[Z] = Pr[x = 0] X + Pr[x = 1] (X - n + 1) = X/2 + (n - X + 1)/2 = (n + 1)/ 2$.
 
-by the linearity of expectations.
+  \item The second algorithm:
 
-Since $X_{i}$ is a bernoulli random variable, $E[X_{i}]$ is equal to the probability that $X_{i}$ is $1$.
-Since the boxes are picked uniformly at random from the remaining $n - i$ not opened boxes. the probability of $X_{i} = 1$ is $\frac{1}{n-i+1}$. Finally, the expected number of opened boxes before getting the prize is
+    \begin{itemize}
+      \item[] $Pr[\text{Open X in step i}] = \frac{1}{i}$
+      \item[] We start with $i = n$ and end on $i = 1$.
+      \item[] $Pr[Z = i] = (1 - \frac{1}{n}) \ldots (1 - \frac{1}{i - 1}) \frac{1}{i}  = \frac{1}{n}$
+      \item[] $E[Z] = \sum_{i = 1}^{n} i \cdot Pr[Z = i] = \sum_{i = 1}^{n} \frac{i}{n} = \frac{1}{n} \sum_{i = 1}^{n} i = \frac{n(n + 1)}{2n} = \frac{n+1}{2}$
+    \end{itemize}
 
-\begin{align*}
-  E[X] &= E[\sum_{i-1}^{n}X_{i}] \\
-       &= \sum_{i-1}^{n}E[X_{i}] \\
-       &= \sum_{i-1}^{n} \frac{1}{n-i+1} \\
-       &= H_{n}
-\end{align*}
+    The expected number of opened boxes before reaching the prize is $(n + 1)/2$.
+\end{itemize}
 
-Recalling that the harmonic number $H_{n}$ satisfies $H_{n} = \ln n + \theta(1)$, we have $E[X] = \ln n + \theta(1)$.
-
-Next, we consider the deterministic algorithm where the input is given at random with probability $\frac{1}{2}$. The algorithm is essentially the same as the randomized version as the box opened at the iteration $i$th is determined by the \textit{random choice} of the sequence of boxes.
+After the analysis, both algorithm yield the same results. Therefore, both algorithms are equally good.
 
 %%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
 
