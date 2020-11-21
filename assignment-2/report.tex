@@ -1,0 +1,172 @@
+\documentclass[12pt, a4paper]{article} % book, report, article, letter, slides
+                                       % letterpaper/a4paper, 10pt/11pt/12pt, twocolumn/twoside/landscape/draft
+
+%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc} % encoding
+
+\usepackage[english]{babel} % use special characters and also translates some elements within the document.
+
+\usepackage{amsmath}        % Math
+\usepackage{amsthm}         % Math, \newtheorem, \proof, etc
+\usepackage{amssymb}        % Math, extended collection
+\usepackage{bm}             % $\bm{D + C}$
+\newtheorem{theorem}{Theorem}[section]     % \begin{theorem}\label{t:label}  \end{theorem}<Paste>
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newenvironment{claim}[1]{\par\noindent\underline{Claim:}\space#1}{}
+\newenvironment{claimproof}[1]{\par\noindent\underline{Proof:}\space#1}{\hfill $\blacksquare$}
+\newcommand\expect[1]{\mathbb{E}[#1]}
+
+\usepackage{hyperref}       % Hyperlinks \url{url} or \href{url}{name}
+
+\usepackage{parskip}        % \par starts on left (not idented)
+
+\usepackage{abstract}       % Abstract
+
+\usepackage{enumitem}       % \item[$ast$] Foo
+
+\usepackage{tocbibind}      % Adds the bibliography to the table of contents (automatically)
+
+\usepackage{graphicx}       % Images
+\graphicspath{{./images/}}
+
+\usepackage[vlined,ruled]{algorithm2e} % pseudo-code
+
+% \usepackage[document]{ragged2e}  % Left-aligned (whole document)
+% \begin{...} ... \end{...}   flushleft, flushright, center
+
+%%%%%%%%%%%%%%%% CODE %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minted}         % Code listing
+% \mint{html}|<h2>Something <b>here</b></h2>|
+% \inputminted{octave}{BitXorMatrix.m}
+
+%\begin{listing}[H]
+  %\begin{minted}[xleftmargin=20pt,linenos,bgcolor=codegray]{haskell}
+  %\end{minted}
+  %\caption{Example of a listing.}
+  %\label{lst:example} % You can reference it by \ref{lst:example}
+%\end{listing}
+
+\newcommand{\code}[1]{\texttt{#1}} % Define \code{foo.hs} environment
+
+%%%%%%%%%%%%%%%% COLOURS %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{xcolor}         % Colours \definecolor, \color{codegray}
+\definecolor{codegray}{rgb}{0.9, 0.9, 0.9}
+% \color{codegray} ... ...
+% \textcolor{red}{easily}
+
+%%%%%%%%%%%%%%%% CONFIG %%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\absnamepos}{flushleft}
+\setlength{\absleftindent}{0pt}
+\setlength{\absrightindent}{0pt}
+
+%%%%%%%%%%%%%%%% GLOSSARIES %%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{glossaries}
+
+%\makeglossaries % before entries
+
+%\newglossaryentry{latex}{
+    %name=latex,
+    %description={Is a mark up language specially suited
+    %for scientific documents}
+%}
+
+% Referene to a glossary \gls{latex}
+% Print glossaries \printglossaries
+
+\usepackage[acronym]{glossaries} %
+
+% \acrshort{name}
+% \acrfull{name}
+\newacronym{kcol}{$k$-COL}{$k$-coloring problem}
+\newacronym{scol}{SEARCH-$k$-COL}{Search $k$-coloring problem}
+\newacronym{2col}{$2$-COL}{$2$-coloring problem}
+\newacronym{e2sat}{$E2$-SAT}{Exactly 2-SAT}
+
+%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[displaymath,textmath,sections,graphics,floats]{preview}
+% \PreviewEnvironment{enumerate}
+\PreviewEnvironment{tabular}
+
+%%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Arnau Abella Gassol}
+\lhead{Randomized Algorithms}
+\rfoot{Page \thepage}
+
+%%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%
+
+\title{%
+  Randomized Algorithms\\
+  \large{Second Assignment}
+}
+\author{%
+  Arnau Abella \\
+  \large{Universitat Polit\`ecnica de Catalunya}
+}
+\date{\today}
+
+%%%%%%%%%%%%%%%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+%%%%%%% Exercise 1
+
+\section*{Exercise 1}%
+\label{sec:exercise_1}
+
+The problem can be generalized to the \textit{bins and balls} problems where the bins are the squared boxed and the balls are the points in the unit space.
+
+Let $n$ be the number of points, $m = n/\log^{2}n$ be the number of square boxes and $X_{i}$ be the random variable counting the number of balls into bin $i$ where $X_{i} \sim B(n, \frac{1}{m})$.
+
+In order to prove that for any $\epsilon \in (0,1)$, \textit{w.h.p} a collection of $n$ points taken \textit{u.a.r} in the unit square is $\epsilon$-nice we need to show that the number of balls in each bin is concentrated in the range $[(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]$.
+
+Recall \textit{Chebyshev's Inequality}: For any $a > 0$,
+
+\begin{equation*}
+  Pr(|X - \expect{X} | \geq a) \leq \frac{Var[X]}{a^2}
+\end{equation*}
+
+The average load in a bin is $\mu = \expect{X_{i}} = n/m = \log^{2} n$. Then, applying \textit{Chebyshev's Inequality} we get
+
+\begin{align*}
+  \Pr(|X - \log^{2}n | \geq \epsilon \log^{2}n) &\leq \frac{\log^{2}n \cdot (1 - \log^{2}n/n)}{(\epsilon\log^{2}n)^2} \\
+  &= \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)}
+\end{align*}
+
+For any $\epsilon$, when $n \to \infty$, the probability that a bin has less than ${(1-\epsilon) \log^{2}n}$ balls or more than $(1 + \epsilon)\log^{2}n$ balls tends to $0$
+
+\begin{equation*}
+  \lim_{n \to \infty} \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)} =
+  \lim_{n \to \infty} \frac{1}{n} = 0
+\end{equation*}
+
+Then, \textit{w.h.p} the number of balls in each bin is in the interval ${[(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]}$ and so, a collection of $n$ points taken \textit{u.a.r} in the unit square is $\epsilon$-nice.
+
+%%%%%%% Exercise 2
+
+\section*{Exercise 2}%
+\label{sec:exercise_2}
+
+%%%%%%% Exercise 3
+
+\section*{Exercise 3}%
+\label{sec:exercise_3}
+
+%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
+
+% \bibliographystyle{unsrt} % abbrv, aplha, plain, abstract, apa, unsrt,
+% \bibliography{refs}
+
+\end{document}
