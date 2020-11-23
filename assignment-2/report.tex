@@ -17,6 +17,7 @@
 \newenvironment{claim}[1]{\par\noindent\underline{Claim:}\space#1}{}
 \newenvironment{claimproof}[1]{\par\noindent\underline{Proof:}\space#1}{\hfill $\blacksquare$}
 \newcommand\expect[1]{\mathbb{E}[#1]}
+\newcommand\angles[1]{\langle #1 \rangle}
 
 \usepackage{hyperref}       % Hyperlinks \url{url} or \href{url}{name}
 
@@ -145,11 +146,11 @@ The average load in a bin is $\mu = \expect{X_{i}} = n/m = \log^{2} n$. Then, ap
   &= \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)}
 \end{align*}
 
-For any $\epsilon$, when $n \to \infty$, the probability that a bin has less than ${(1-\epsilon) \log^{2}n}$ balls or more than $(1 + \epsilon)\log^{2}n$ balls tends to $0$
+For any $\epsilon \in (0,1)$, when $n \to \infty$, the probability that a bin has less than ${(1-\epsilon) \log^{2}n}$ balls or more than $(1 + \epsilon)\log^{2}n$ balls tends to $0$
 
 \begin{equation*}
   \lim_{n \to \infty} \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)} =
-  \lim_{n \to \infty} \frac{1}{n} = 0
+  \lim_{n \to \infty} \frac{\epsilon^{-1}}{n} = 0
 \end{equation*}
 
 Then, \textit{w.h.p} the number of balls in each bin is in the interval ${[(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]}$ and so, a collection of $n$ points taken \textit{u.a.r} in the unit square is $\epsilon$-nice.
@@ -159,10 +160,144 @@ Then, \textit{w.h.p} the number of balls in each bin is in the interval ${[(1-\e
 \section*{Exercise 2}%
 \label{sec:exercise_2}
 
+\begin{enumerate}[label=(\alph*)]
+  \item Show using Chebyshev that $(r^{2}/\epsilon^{2}\delta)$ samples are sufficient to solve the problem.
+
+  \textbf{Solution} Let $r = \sqrt{Var[X]}/\expect{X}$.
+
+    We are going to bound the probability of \textbf{not} being in the \textit{confidence interval} using Chebyshev's Inequality,
+
+    \begin{align*}
+      Pr((\sum_{i=1}^{t}X_{i})/t \ge (1+\epsilon)\expect{X}) &=  Pr(\sum_{i=1}^{t}X_{i} \ge t(1+\epsilon)\expect{X}) \\
+      &= Pr(\sum_{i=1}^{t}X_{i} \ge t\expect{X} + \epsilon t \expect{X}) \\
+    \end{align*}
+
+    Let $Y = \sum_{i=1}^{t}X_{i}$ be a random variable. Notice that $\expect{Y} = \expect{\sum_{i=1}^{t}X_{i}} = \sum_{i=1}^{t}\expect{X_{i}} = \sum_{i=1}^{t}\expect{X} = t \cdot \expect{X}$. The same applies to the \textit{variance}.
+    Then, using the new random variable $Y$ and the previous assumptions, we can bound the error using Chebyshev's Inequality,
+
+
+    \begin{align*}
+      Pr(\sum_{i=1}^{t}X_{i} \ge t\expect{X} + \epsilon t \expect{X}) &= Pr (Y \ge \expect{Y} + \epsilon \expect{Y}) \\
+      &= Pr (Y - \expect{Y} \ge \epsilon \expect{Y}) \\
+      &\le Pr (|Y - \expect{Y}| \ge \epsilon \expect{Y}) \\
+      &\le \frac{Var(Y)}{(\epsilon \expect{Y})^{2}} \\
+      &= \frac{Var(\sum_{t=1}^{t}X_{i})}{(\epsilon t \expect{Y})^{2}} \\
+      &= \frac{t Var (X)}{\epsilon^{2} t^{2} \expect{Y}^{2}} \\
+      &= \frac{t}{\epsilon^{2} t^{2}} \frac{Var(x)}{\expect{X}^{2}} \\
+      &= \frac{r^{2}}{\epsilon^{2} t}
+    \end{align*}
+
+    Then, the number of samples $t$ to bound the probability of the estimation being in the interval to be at least $1-\delta$ is
+
+    \begin{align*}
+      Pr((\sum_{i=1}^{t}X_{i})/t < (1+\epsilon)\expect{X}) &= 1 - Pr((\sum_{i=1}^{t}X_{i})/t \ge (1+\epsilon)\expect{X}) \\
+      &= 1 - \frac{r^{2}}{\epsilon^{2} t} \\
+      &\ge 1 - \delta
+    \end{align*}
+
+    when $t = O(r^{2}/\epsilon^{2} \delta)$ the probability of being in the interval is $\ge 1 - \delta$.
+
+  %%%%%%%%%%%%%
+  \item Suppose that we need only a weak estimate that is within $\epsilon\expect{X}$ of $\expect{X}$, with probability at least $3/4$. Argue that $O(r^{2}/\epsilon^{2})$ samples are enough for this weak estimate.
+
+  \textbf{Solution} When $\delta = 1/4$, the probability of having a weak estimate within $\epsilon\expect{X}$ of $\expect{X}$ is $1 - \delta = 3/4$. From the previous exercise, in order to achieve a probability of at least $1 - \delta$, the number of samples $t$ must be $t = O(\frac{r^{2}}{\epsilon^{2} \delta})$, replacing $\delta = 1/4$, we have $t = O(\frac{r^{2}}{\epsilon^{2}})$.
+  %%%%%%%%%%%%%
+  \item Show that, by taking the median of $O(\lg(1/\delta))$ weak estimates, we can obtain an estimate within $\epsilon\expect{X}$ of $\expect{X}$ with probability at least $(1 - \delta)$. Conclude that we need only $r^{2}\lg(1/\delta)/\epsilon^{2}$ samples.
+
+    \textbf{Solution} Let's define a new random variable $X_{i}$ such that $X_{i} = 1$ if the $i$th weak estimate is outside of the confidence interval $\epsilon \expect{X}$ and $X_{i} = 0$ otherwise.
+
+    Notice, if the median is within the confidence interval, less than half of the weak estimates are outside the confidence interval. Hence, $X_{i} \sim B(n, 1/4)$.
+
+    Let $X = \sum_{i=1}^{m} X_{i}$ be the random variable counting the number of weak estimates that fall outside the confidence interval. To obtain an estimation with an error of $O(\delta)$, we will bound $Pr(X \ge m/2) \le \delta$ applying Chernoff,
+
+    \begin{equation*}
+      Pr(X \ge (1 + \delta)\expect{X}) \le e^{-\expect{X} \delta ^{2} / 3}
+    \end{equation*}
+
+    Using $\expect{X} = m/4$ and $\delta = 1$,
+
+    \begin{equation*}
+      Pr(X \ge m/2) \le e^{-m/12}
+    \end{equation*}
+
+    Chernoff bound gives a bound on the error of $e^{-m/12}$ and we would like to bound it to $\delta$. So, when $m = 12 \ln (1/\delta) = O(\ln (1/\delta))$, the probability of error is at most $\delta$.
+  %%%%%%%%%%%%%
+\end{enumerate}
+
 %%%%%%% Exercise 3
 
 \section*{Exercise 3}%
 \label{sec:exercise_3}
+
+\begin{enumerate}[label=(\alph*)]
+  \item Show that if $\mathcal{H}$ is 2-universal, the it is universal.
+
+  \textbf{Solution} If $\mathcal{H}$ is 2-universal, for any fixed pair of distinct keys $\langle x, y\rangle$ and for any $h \in \mathcal{H}$ chosen at random, the sequence $\langle h(x), h(y) \rangle$ is equally likely to be any of the $m^{2}$ sequences with elements draw from $\{0,1, \ldots , m - 1\}$. From the $m^{2}$ distinct sequences, $m$ of them are of the form $\langle x, x \rangle$ and so, the number of collisions for any random $h \in \mathcal{H}$ is $m/m^{2} = 1/m$ and the total number of collisions is $1/m \cdot |\mathcal{H}|$. Therefore, by definition, $\mathcal{H}$ is \textit{universal}.
+
+  %%%%%%%%%%%%%
+  \item Suppose that $U$ is the set of $n$-tuples of values drawn from $ \mathbb{Z}_{p} = \{0,1,\ldots, p - 1\}$, where $p$ is prime. Consider an element $x = \langle x_{0}, x_{1}, \ldots, x_{n-1}\rangle \in U$. For any $n$-tuple $a = \langle a_{0}, a_{1}, \ldots, a_{n-1}\rangle \in U$, define the hash function as $h_{a}(x) = (\sum_{j=0}^{n-1}a_{j}x_{j}) \mod p$. Let $\mathcal{H} = \{h_{a}\}$. Prove that $\mathcal{H}$ is universal, but not 2-universal.
+
+    \textbf{Solution} First, let's show that $\mathcal{H}$ is universal. Consider two distinct keys $k$ and $l$ from $\mathbb{Z}_{p}$, so that $k \neq l$. For any given hash function $h_{a}$ we let
+
+    \begin{align*}
+      r &= \sum_{i = 0}^{n-1}(a_{i}k_{i}) \mod p \\
+      s &= \sum_{i = 0}^{n-1}(a_{i}l_{i}) \mod p \\
+      r &- s \equiv a(\sum_{i = 0}^{n-1} k_{i} l_{i}) \mod p
+    \end{align*}
+
+    Note that $r \neq s$ because $p$ is prime and both $a$ and $(k - l)$ are nonzero modulo $p$, and so their product must also be nonzero modulo $p$. Therefore, when computing any $h_{a} \in \mathcal{H}$, distinct inputs $k$ and $l$ maps to distinct values $r$ and $s$ modulo $p$; there are no collisions yet.
+
+    The probability that distinct keys $k$ and $l$ collide is equal to the probability that $r \equiv s (mod \ m)$ when $r$ and $s$ are randomly chosen as distinct values modulo $p$. For a given value of $r$, of the $p - 1$ possible remaining values for $s$, the number of values $s$ such that $s \neq r$ and $s \equiv r (mod \ m)$ is at most
+
+    \begin{align*}
+      \lceil p/m \rceil - 1 &\leq ((p + m - 1)/m) - 1 \\
+                            &= (p - 1)/m
+    \end{align*}
+
+    The probability that $s$ collides with $r$ when reduced to modulo $m$ is at most $((p - 1)/m)/(p-1) = 1/m$.
+    Therefore, for any pair of distinct  values $k, l \in \mathbb{Z}_{p}$,
+
+    \begin{equation*}
+      Pr(h_{a}(k) = h_{a}(l)) \leq 1/m
+    \end{equation*}
+
+    so $\mathcal{H}$ is universal.
+
+    Secondly, we prove that $\mathcal{H}$ is not 2-universal by counterexample. If we fix $k$ to be $\langle 0, 0, \ldots, 0 \rangle$ and an arbitrary $y$. For any $a \in U$, $\langle h_{a}(x), h_a(y) \rangle = \langle 0, h_{a}(y)\rangle$. Therefore, not all sequence are equally likely to appear and so $\mathcal{H}$ is not 2-universal.
+
+  %%%%%%%%%%%%%
+  \item Suppose that we modify $\mathcal{H}$ slightly from part (2): for any $a \in U$ and $b \in \mathbb{Z}_{p}, h'_{ab}(x) = (\sum_{j=0}^{n-1} a_{j}x_{j} + b) \mod p$ and $\mathcal{H}' = \{h'_{ab}\}$, argue that $\mathcal{H}'$ is 2-universal.
+
+    \textbf{Solution} The proof is similar to the previous one but now we want to prove that
+    all pairs $\angles{h'_{a,b}(k), h'_{a,b}(l)}$ are equally likely when $h$ is chosen at random.
+
+    Since $k \neq l$, at least one bit differs. To simplify the prove, let's assume that $k_{0} \neq l_{0}$. Let $K = \sum_{i=1}^{n-1} a_{i}k_{i}$ and $L = \sum_{i=1}^{n-1} a_{i}l_{i}$ be the rest of the bits from $k$ and $l$, respectively. Let $r = h'_{a,b}(k)$ and $s = h'_{a,b}(l)$. Define,
+
+    \begin{align*}
+      r &\equiv (a_{0}k_{0} + b + K) \mod p\\
+      s &\equiv (a_{0}l_{0} + b + L) \mod p\\
+      r - s &\equiv a_{0}(k_{0} - l_{0}) + K - L \mod p\\
+    \end{align*}
+
+    We want to generate all possible pairs of $\angles{r, s}$ by adjusting $r - s$. Since $k_{0} \neq l_{0}$, $K = L$ and $p$ is prime, the result $r - s$ is completely determined by the choice of $a_{0}$ and $b$. We can determine the right $a_{0}$ by solving the following modular equation
+
+    \begin{align*}
+      a_{0} &\equiv (r - s)(k_{0} - l_{o})^{-1} \mod p\\
+    \end{align*}
+
+    Notice, $(k_{0} - l_{o})^{-1}$ exists only when $(k_{0} - l_{o})$ is \textit{coprime} with respect to $p$. Since $(k_{0} - l_{o}) \neq 0$ and $p$ is prime, the system has a solution. Once $a_{0}$ is computed, $b$ can be computed by substitution.
+
+    Now, we need to prove that the number of possible pairs $\angles{r, s}$ is $p^{2}$ and each pair is equally likely. Since, there are $p^{2}$ possible choices for $\angles{a_{0}, b}$ and each choice results in a different pair $r - s$, the total number of pairs $\angles{r, s}$ is $p^{2}$. Each $h'_{a,b}$ is chosen uniformly at random from $\mathcal{H}$ and so is $a_{0}$ and $b$. All possible $p^{2}$ pairs are equally likely and by definition $\mathcal{H}$ is 2-universal.
+
+  %%%%%%%%%%%%%
+  \item
+
+    \textbf{Solution} Once the adversary intercepts the message, the adversary could use all computational power to compute all possible values for $t$ by computing $\{h(m) | h \in \mathcal{H}\}$. However, since $\mathcal{H}$ is 2-universal, each possible value $t \in \{0, 1, \ldots, p - 1\}$ will appear with probability $1/p$.
+
+    So, the adversary can only \textit{guess} the $h \in \mathcal{H}$ used by Bob and Alice.
+    Once the adversary has picked $m'$, the adversary can only guess the value of $t'$. Since all pairs are equally likely, there are $p$ possible values for $t' = h(m')$ and the probability of fooling Bob is $1/p$.
+  %%%%%%%%%%%%%
+\end{enumerate}
 
 %%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
 
