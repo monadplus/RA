@@ -16,6 +16,6 @@ clean:
 	rm -f *.eps
 	rm -f *.aux *.log *.out *.bbl *.blg *~ *.bak $(TARGET).ps
 	rm -f *.brf *.lof *.lot *.toc *.glo *.ist
-	rm -rf _minted-* .auctex-auto _region_* *_region_ *.prv
+	rm -rf _minted-* .auctex-auto _region_* *_region_ *.prv report.synctex.gz
 
 # End

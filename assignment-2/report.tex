@@ -108,7 +108,7 @@
 
 \title{%
   Randomized Algorithms\\
-  \large{Second Assignment}
+  \large{Control 2}
 }
 \author{%
   Arnau Abella \\
@@ -133,27 +133,65 @@ Let $n$ be the number of points, $m = n/\log^{2}n$ be the number of square boxes
 
 In order to prove that for any $\epsilon \in (0,1)$, \textit{w.h.p} a collection of $n$ points taken \textit{u.a.r} in the unit square is $\epsilon$-nice we need to show that the number of balls in each bin is concentrated in the range $[(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]$.
 
-Recall \textit{Chebyshev's Inequality}: For any $a > 0$,
+First, we try to show it using \textit{Markov's Inequality}. For any constant $a > 0$
+
+\begin{equation*}
+  Pr(X \ge b\expect{X}) \le \frac{1}{b}
+\end{equation*}
+
+The average load in a bin is $\mu = \expect{X_{i}} = n/m = \log^{2} n$. Then, applying \textit{Markov's Inequality} we get
+
+\begin{align*}
+  &Pr(X \ge (1 - \epsilon)log^{2}n) \le \frac{1}{(1 - \epsilon)} \\
+  &Pr(X \ge (1 + \epsilon)log^{2}n) \le \frac{1}{(1 + \epsilon)} \\
+\end{align*}
+
+Notice, that $\frac{1}{(1 - \epsilon)} \ge \frac{1}{(1 + \epsilon)} \ \forall \epsilon \in (0,1)$ and so $Pr(X \ge (1 - \epsilon)log^{2}n)$ is an upper bound for the probability of being $\epsilon$-nice. Then, the probability to be $\epsilon$-nice is
+
+\begin{align*}
+  Pr(\epsilon\text{-nice}) &= (Pr(\text{points in each box} \in [(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]))^{\text{boxes}}\\
+                           &= (Pr(X \ge (1 - \epsilon)log^{2}n) - Pr(X \ge (1 + \epsilon)log^{2}n))^{n/\log^{2} n} \\
+                           &\le (\frac{1}{(1 - \epsilon)} - \frac{1}{(1 + \epsilon)})^{n/\log^{2} n} \\
+                           &= (\frac{2}{(1 - \epsilon)(1 + \epsilon)})^{n/\log^{2} n}
+\end{align*}
+
+If we inspect the limits at $\epsilon \to 0$,
+
+\begin{align*}
+  \lim_{\epsilon \to 0} (\frac{2}{(1 - \epsilon)(1 + \epsilon)})^{n/\log^{2} n} = 0
+\end{align*}
+
+the probability of being $\epsilon$-nice tends to 0. So, with Markov's Inequality we cannot show that for any $\epsilon \in (0,1)$, a collection of $n$ points taken \textit{uar} in the unit square is $\epsilon$-nice.
+
+Let's try proving it using \textit{Chebyshev's Inequality}. For any $a > 0$,
 
 \begin{equation*}
   Pr(|X - \expect{X} | \geq a) \leq \frac{Var[X]}{a^2}
 \end{equation*}
 
-The average load in a bin is $\mu = \expect{X_{i}} = n/m = \log^{2} n$. Then, applying \textit{Chebyshev's Inequality} we get
+Then, applying \textit{Chebyshev's Inequality} we get that the probability that a box contains at least $(1-\epsilon) \log^{2}n$ points and at most $(1 + \epsilon)\log^{2}n$ points is
 
 \begin{align*}
   \Pr(|X - \log^{2}n | \geq \epsilon \log^{2}n) &\leq \frac{\log^{2}n \cdot (1 - \log^{2}n/n)}{(\epsilon\log^{2}n)^2} \\
-  &= \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)}
+        &= \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)}
 \end{align*}
 
-For any $\epsilon \in (0,1)$, when $n \to \infty$, the probability that a bin has less than ${(1-\epsilon) \log^{2}n}$ balls or more than $(1 + \epsilon)\log^{2}n$ balls tends to $0$
+The, the probability that a collection of $n$ points taken \textit{uar} in the unit square is $\epsilon$-nice is
 
-\begin{equation*}
-  \lim_{n \to \infty} \frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)} =
-  \lim_{n \to \infty} \frac{\epsilon^{-1}}{n} = 0
-\end{equation*}
+\begin{align*}
+  \Pr(\epsilon\text{-nice}) &= (\Pr(\text{points in each box} \in [(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]))^{\text{boxes}}\\
+                            &\leq (\frac{\log^{2}n \cdot (1 - \log^{2}n/n)}{(\epsilon\log^{2}n)^2})^{n/\log^{2} n} \\
+                            &= (\frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)})^{n/\log^{2} n}
+\end{align*}
 
-Then, \textit{w.h.p} the number of balls in each bin is in the interval ${[(1-\epsilon) \log^{2}n, (1 + \epsilon)\log^{2}n]}$ and so, a collection of $n$ points taken \textit{u.a.r} in the unit square is $\epsilon$-nice.
+If we inspect the limits at $\epsilon \to 1$,
+
+\begin{align*}
+  \lim_{\epsilon \to 1} (\frac{1 - (\log^{2}n/n)}{(\epsilon^2\log^{2}n)})^{n/\log^{2} n} &= (\frac{n - \log^{2}n}{n \log^{2}n})^{n/\log^{2} n}\\
+  &= (\frac{1}{log^{2}n} - \frac{1}{n})^{n/\log^{2} n}
+\end{align*}
+
+the probability of being $\epsilon$-nice tends to $0$ when $n$ tends to $\infty$. So, with Chebyshev's Inequality we cannot show that for any $\epsilon \in (0,1)$, a collection of $n$ points taken \textit{uar} in the unit square is $\epsilon$-nice.
 
 %%%%%%% Exercise 2
 
