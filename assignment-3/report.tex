@@ -95,6 +95,12 @@
 % \PreviewEnvironment{enumerate}
 \PreviewEnvironment{tabular}
 
+%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning}
+
+
 %%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{fancyhdr}
@@ -127,19 +133,287 @@
 \section*{Exercise 1}%
 \label{sec:exercise_1}
 
+The lollipop graph on $n$ vertices is a clique on $n/2$ vertices connected to a path on $n/2$ vertices, as shown in the figure below. The node $u$ is a part of both the clique and the path.
+
+Let $v$ denote the other end of the path.
+
+\begin{enumerate}[label=(\alph*)]
+  \item Show that the expected covering time of a random walk starting at $v$ is $O(n^{2})$
+
+        In order to compute the expected covering time, we need to compute the expected traveling time from $v$ to $u$ and from $u$ to each node in the clique. This can be simplified to $h_{v,u} + \sum_{w \in clique}h_{u,w} + h_{w,u}$  and still achieve the bound $O(n^{2})$. We divide the problem in two parts, computing $h_{v,u}$ and covering the clique. Let $n = 2k$ be the total number of vertices in the graph so each part has $k$ vertices. The hitting time $h_{v,u}$ is just traversing the path from $v$ to $u$. From literature we known its  value $h_{v,u} = k^{2}$.
+
+        The cover time of the clique $C_{clique}$ is bounded by $\leq \sum_{w \in clique} h_{u,w} + h_{w,u}$. Let $w, w'$ denote nodes in the clique different from $u$ and let $i \in \{1,2, \ldots, v\}$ denote the nodes in the path. We can compute $h_{u,w}$ by solving the following system of equations
+
+        \begin{align*}
+          h_{u,w} &= 1 + \frac{1}{k} \cdot 0 + \frac{k - 2}{k}h_{w',w} + \frac{1}{k}h_{1,w} \\
+          h_{w',w} &= 1 + \frac{1}{k} \cdot 0 + \frac{k-3}{k-1}h_{w',w} + \frac{1}{k-1}h_{u,w} \\
+          &\\
+          h_{1,w} &= 1 + \frac{1}{2}h_{u,w} + \frac{1}{2}h_{2,w}\\
+          h_{2,w} &= 1 + \frac{1}{2}h_{1,w} + \frac{1}{2}h_{3,w}\\
+          \ldots & \\
+          h_{k,w} &= 1 + h_{k-1,w}
+        \end{align*}
+
+        Solving the system of equations we get that $h_{k-i,w} = h_{k-i-1, w} + (2i + 1)$, so $h_{1,w} = h_{u,w} + 2k - 1$ and finally $h_{u,w} = \frac{k^{2} + 9k - 2}{2k}$.
+
+        The only thing left is computing $h_{w,u}$ but we know that this value is bounded in undirected non-bipartite by $\leq 2|E| = 2\frac{k(k-1)}{2} = k^{2} - k$. So, the covering time ${C_{clique} \leq \sum_{w \in clique} h_{u,w} + h_{w,u} \leq (k - 1) \frac{k^{2} + 9k - 2}{2k} + k^{2} - k}$.
+
+        Putting all the pieces together, the covering time starting from $v$ is $\leq h_{v,u} + C_{clique} = k^{2} + (k - 1) \frac{k^{2} + 9k - 2}{2k} + k^{2} - k = O(k^{2})$.
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Show that the expected covering time of a random walk starting at $u$ is $O(n^{3})$
+
+        From the previous section, we know that covering the clique is bounded by $O(n^{2})$ so the increment of complexity is due the hitting time of $h_{u,v}$ (which is different from $h_{v,u}$). By solving the following system of equations
+
+        \begin{align*}
+          h_{u,v} &=  1 + \frac{1}{k}h_{1,v} + \frac{k-1}{k} h_{w,v}\\
+          h_{w,v} &=  1 + \frac{1}{k-1}h_{u,v} + \frac{k-2}{k-1} h_{w,v}\\
+          h_{i,v} &=  1 + \frac{1}{2}h_{i+1,v} + \frac{1}{2} h_{i-1,v}\\
+          h_{v,v} &=  0
+        \end{align*}
+
+        we get that $h_{w,v} = h_{u,v} + k - 1$. Then, by induction we get that $h_{k-i,v} = \frac{i}{i+1}h_{k-i-1,v} + i$ which leads to $h_{1,v} = \frac{k-1}{k}h_{u,v} + k - 1$. Finally, plugin all equations together we get $h_{u,v} = \frac{k-1}{k}(h_{u,v} + k - 1) + \frac{1}{k}(\frac{k-1}{k}h_{u,v} + k - 1) + 1 = O(n^{3})$ that bounds the covering time starting from $u$ as we mentioned before.
+
+\end{enumerate}
+
 %%%%%%% Exercise 2
 
 \section*{Exercise 2}%
 \label{sec:exercise_2}
+
+Assume that an experiment has $m$ equally probable outcomes. Show that the expected number of independent trials before the first occurrence of $k$ consecutive occurrences of one of these outcomes is
+
+\begin{equation}\label{eq:1}
+  \frac{m^{k}-1}{m - 1}
+\end{equation}
+
+Hint: Form an absorbing Markov chain with states representing the length of the current run.
+
+  \begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[font=\sffamily]
+    \tikzset{
+        node distance=1.5cm,
+        el/.style = {inner sep=2pt, align=left, sloped},
+        state/.style={minimum size=30pt,font=\small,circle,draw},
+        dots/.style={state,draw=none},
+        edge/.style={->},
+      }
+    \node [state] (0)                    {$0$};
+    \node [state] (1)   [right of = 0]   {$1$};
+    \node [state] (2)   [right of = 1]   {$2$};
+    \node [dots]  (d1)  [right of = 2]   {$\cdots$};
+    \node [state] (km1) [right of = d1]  {$k-1$};
+    \node [state] (k)   [right of = km1] {$k$};
+
+    % Connect the states with arrows
+    \draw[every loop,
+          auto=right,
+          >=latex]
+        (0)   edge[bend left, auto=left]  node {$1$} (1)
+        (1)   edge[bend left, auto=left]  node {$\frac{1}{m}$} (2)
+        (1)   edge[loop above]            node {$\frac{m-1}{m}$} (1)
+        (2)   edge[bend left, auto=right] node [el, below]{$\frac{m-1}{m}$} (1)
+        (2)   edge[bend left, auto=left]  node {$\frac{1}{m}$} (d1)
+        (d1)  edge[bend left, auto=left]  node {$\frac{1}{m}$} (km1)
+        (d1)  edge[bend left=70, auto=left]  node {$\frac{m-1}{m}$} (1)
+        (km1) edge[bend left, auto=left]  node {$\frac{1}{m}$} (k)
+        (km1) edge[bend left=100, auto=right] node [el, below] {$\frac{m-1}{m}$} (1)
+        (k)   edge[loop above]            node {$1$} (k)
+        ;
+   \end{tikzpicture}
+  \caption{Markov Chain formulation corresponding to the $k$ repetition of an independent trial experiment} \label{fig:MC}
+  \end{figure}
+
+  Given the markov chain \ref{fig:MC} corresponding to the formulation of the experiment runs, we can compute the expected number of independent trials before $k$ repetitions of the same event happens by solving the following systme of equations
+
+  \begin{align*}
+    h_{k} &= 0 \\
+    h_{j} &= \frac{m-1}{m} h_{1} + \frac{1}{m} h_{j+1} + 1 \quad 1 \leq j \leq k - 1 \\
+    h_{0} &= h_{1} + 1
+  \end{align*}
+
+  We can show inductively that, for $0 \leq j \leq k - 1$
+
+  \begin{equation*}
+    h_{j} = h_{j+1} + m^{j}
+  \end{equation*}
+
+  It is true when $j = 0$, since $h_{0} = h_{1} + 1$. For other values of $j$ we use the equation
+
+  \begin{equation*}
+    h_{j} = \frac{m-1}{m} h_{1} + \frac{1}{m} h_{j+1} + 1
+  \end{equation*}
+
+  to obtain
+
+  \begin{align*}
+    h_{j+1} &= h_{j} - \frac{m-1}{m} h_{1} - 1 \\
+           &= h_{j} - (\frac{m-1}{m}\sum_{i = 0}^{j} m^{j}) - 1\\
+           &= h_{j} - \frac{(m-1)(m^{j+1} - 1)}{(m-1)m} - 1\\
+           &= h_{j} - \frac{m(m^{j} - 1)}{m} - 1\\
+           &= h_{j} - (m^{j} - 1) - 1\\
+           &= h_{j} - m^{j}
+  \end{align*}
+
+  using the induction hypothesis in the second line. We can conclude that
+
+  \begin{equation*}
+    h_{0} = \sum_{j=0}^{k-1} m^{j} = \frac{m^{k}- 1}{m-1}
+  \end{equation*}
+
+It has been found that, in the decimal expansion of $pi = 3.14159\ldots$, starting with the $24,658,601$st digit, there is a run of nine $7$'s. What would your result say about the hypothesis that the digits of $pi$ are produced randomly?
+
+If we consider the digits of $pi$ to be randomly produced by independent trials of $m = 10$ equiprobable values, the expected number of trials to produce $k = 9$ consecutive digits with the same value is $\frac{m^{k} - 1}{m - 1} = \frac{10^{9} - 1}{9} = 111,111,111$. Then, applying the Chernoff bounds for independent Poisson trials we get that the probability of having nine $7$'s in a random number of only $24,658,601$ digits is ${Pr(X \leq (1 - \delta)\mu) \leq e^{- \mu \delta^{2}/2}} = \exp (- \frac{\frac{10^{9}- 1}{9} 0.778^{2}}{2})$, which is very unlikely.
 
 %%%%%%% Exercise 3
 
 \section*{Exercise 3}%
 \label{sec:exercise_3}
 
-%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%
+Two players, $A$ and $B$, play the game of matching pennies: at each time $n$, each player has a penny and must secretly turn the penny to heads or tails. The players then reveal their choices simultaneously. If the pennies match (both heads or both tails), Player $A$ wins the penny. If the pennies do not match (one heads and one tails), Player B wins the penny.
 
-% \bibliographystyle{unsrt} % abbrv, aplha, plain, abstract, apa, unsrt,
-% \bibliography{refs}
+Suppose the players have between them a total of 5 pennies. If at any time one players has all of the pennies, to keep the game going, he gives one back to the other player and the game will continue.
+
+\begin{enumerate}[label=(\alph*)]
+  \item Show that this game can be formulated as a Markov chain.
+
+  \begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[font=\sffamily]
+    \tikzset{
+        node distance=1.5cm,
+        el/.style = {inner sep=2pt, align=left, sloped},
+        state/.style={minimum size=30pt,font=\small,circle,draw},
+        dots/.style={state,draw=none},
+        edge/.style={->},
+      }
+    \node [state] (1)                    {$1$};
+    \node [state] (2)   [right of = 1]   {$2$};
+    \node [state] (3)   [right of = 2]   {$3$};
+    \node [state] (4)   [right of = 3]   {$4$};
+
+    \draw[every loop,
+          auto=right,
+          >=latex]
+        % Right
+        (1)   edge[bend left, auto=left]  node {$1/2$} (2)
+        (2)   edge[bend left, auto=left]  node {$1/2$} (3)
+        (3)   edge[bend left, auto=left]  node {$1/2$} (4)
+
+        % Left
+        (4)   edge[bend left, auto=right]  node [el, below] {$1/2$} (3)
+        (3)   edge[bend left, auto=right]  node [el, below] {$1/2$} (2)
+        (2)   edge[bend left, auto=right]  node [el, below] {$1/2$} (1)
+
+        % Loop
+        (1)   edge[loop above]            node {$1/2$} (1)
+        (4)   edge[loop above]            node {$1/2$} (4)
+        ;
+   \end{tikzpicture}
+  \caption{Markov Chain formulation of the Matching Pennies Problem} \label{fig:MC2}
+  \end{figure}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+  \item Is the chain regular (irreducible + aperiodic?)
+
+  The chain is not regular because it is periodic with a period of $\frac{1}{2}$.
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+  \item If player $A$ starts with $3$ pennies and Player $B$ with $2$, what is the probability that $A$ will lose his pennies first?
+
+  \begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[font=\sffamily]
+    \tikzset{
+        node distance=1.5cm,
+        el/.style = {inner sep=2pt, align=left, sloped},
+        state/.style={minimum size=30pt,font=\small,circle,draw},
+        dots/.style={state,draw=none},
+        edge/.style={->},
+      }
+    \node [state] (0)                    {$0$};
+    \node [state] (1)   [right of = 0]   {$1$};
+    \node [state] (2)   [right of = 1]   {$2$};
+    \node [state] (3)   [right of = 2]   {$3$};
+    \node [state] (4)   [right of = 3]   {$4$};
+    \node [state] (5)   [right of = 4]   {$5$};
+
+    \draw[every loop,
+          auto=right,
+          >=latex]
+        % Right
+        (1)   edge[bend left, auto=left]  node {$1/2$} (2)
+        (2)   edge[bend left, auto=left]  node {$1/2$} (3)
+        (3)   edge[bend left, auto=left]  node {$1/2$} (4)
+        (4)   edge[bend left, auto=left]  node {$1/2$} (5)
+
+        % Left
+        (4)   edge[bend left, auto=right]  node [el, below] {$1/2$} (3)
+        (3)   edge[bend left, auto=right]  node [el, below] {$1/2$} (2)
+        (2)   edge[bend left, auto=right]  node [el, below] {$1/2$} (1)
+        (1)   edge[bend left, auto=right]  node [el, below] {$1/2$} (0)
+
+        % Loop
+        (0)   edge[loop above]            node {$1$} (0)
+        (5)   edge[loop above]            node {$1$} (5)
+        ;
+   \end{tikzpicture}
+  \caption{Alternative Markov Chain formulation of the Matching Pennies Problem} \label{fig:MC3}
+  \end{figure}
+
+  The formulation \ref{fig:MC3} is more suited to compute the probability of losing or winning. Let's generalize the problem by switching the probability of winning to $p$, the probability of losing to $q = 1 - p$ and $n$ pennies. Let's compute the probability of winning starting from an arbitrary amount of pennies $i$. The probability of winning starting from $i$ is $P_{i} = pP_{i+1} + qP_{i-1}$. Since $p + q = 1$, we can rewrite it as $pP_{i}+ qP_{i} = pP_{i+1} + qP_{i-1}$, yielding
+
+  \begin{equation*}
+    P_{i+1} - P_{i} = \frac{q}{p}(P_{i} - P_{i-1})
+  \end{equation*}
+
+  In particular, $P_{2} - P_{1} = (q/p)(P_{1} - P_{0}) = (q/p)P_{1}$ (since $P_{0} = 0$), and so $P_{3} - P_{2} = (q/p)(P_{2}- P_{1}) = (q/p)^{2}P_{1}$, and more generally
+
+  \begin{align*}
+    P_{i+1} - P_{1} &= \sum_{k=1}^{i}(P_{k+1} - P_{k})\\
+                    &=  P_1 \sum_{k=1}^{i} (q/p)^k
+  \end{align*}
+
+  yielding
+
+  \begin{align}\label{eq:1}
+    P_{i+1} &= P_{1} + P_1 \sum_{k=1}^{i} (q/p)^k = P_1 (\sum_{k=1}^{i} (q/p)^k + 1) = P_1 \sum_{k=0}^{i} (q/p)^k\\
+           &= \begin{cases}
+                 P_{1}\frac{1-(q/p)^{i+1}}{1-(q/p)} & if \ p \neq q\\
+                 P_{1}(i + 1) & if \ p = q
+             \end{cases}\\
+  \end{align}
+
+  (Note we used the geometric series $\sum_{i=0}^{n} c^{i} = \frac{1 - c^{n+1}}{1-c}, \quad c \neq 1$ on the second equation). Choosing $i = n - 1$ and using the fact that $P_{n} = 1$ yields
+
+  \begin{equation*}
+    1 = P_{n} = \begin{cases}
+                 P_{1}\frac{1-(q/p)^{n}}{1-(q/p)} & if \ p \neq q\\
+                 P_{1}n & if \ p = q
+                \end{cases}
+  \end{equation*}
+
+  from which we conclude that
+
+  \begin{equation*}
+       P_{1} = \begin{cases}
+                 \frac{1-(q/p)}{1-(q/p)^{n}} & if \ p \neq q\\
+                 \frac{1}{n} & if \ p = q
+                \end{cases}
+  \end{equation*}
+
+  thus obtaining from \ref{eq:1} the solution
+
+  \begin{equation*}
+       P_{i} = \begin{cases}
+                 \frac{1-(q/p)^{i}}{1-(q/p)^{n}} & if \ p \neq q\\
+                 \frac{i}{n} & if \ p = q
+                \end{cases}
+  \end{equation*}
+
+  Note that the probability of losing is $1 - P_{i}$. In our particular case, $p = q = 0.5, n = 5, i = 3$, so the probability of losing is $1 - \frac{3}{5} = \frac{2}{5}$.
+
+\end{enumerate}
 
 \end{document}
