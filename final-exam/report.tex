@@ -1,0 +1,362 @@
+\documentclass[12pt, a4paper]{article} % book, report, article, letter, slides
+                                       % letterpaper/a4paper, 10pt/11pt/12pt, twocolumn/twoside/landscape/draft
+
+%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc} % encoding
+
+\usepackage[english]{babel} % use special characters and also translates some elements within the document.
+
+\usepackage{amsmath}        % Math
+\usepackage{amsthm}         % Math, \newtheorem, \proof, etc
+\usepackage{amssymb}        % Math, extended collection
+\usepackage{bm}             % $\bm{D + C}$
+\newtheorem{theorem}{Theorem}[section]     % \begin{theorem}\label{t:label}  \end{theorem}<Paste>
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newenvironment{claim}[1]{\par\noindent\underline{Claim:}\space#1}{}
+\newenvironment{claimproof}[1]{\par\noindent\underline{Proof:}\space#1}{\hfill $\blacksquare$}
+\newcommand\expect[1]{\mathbb{E}[#1]}
+\newcommand\angles[1]{\langle #1 \rangle}
+
+\usepackage{hyperref}       % Hyperlinks \url{url} or \href{url}{name}
+
+\usepackage{parskip}        % \par starts on left (not idented)
+
+\usepackage{abstract}       % Abstract
+
+\usepackage{enumitem}       % \item[$ast$] Foo
+
+\usepackage{tocbibind}      % Adds the bibliography to the table of contents (automatically)
+
+\usepackage{graphicx}       % Images
+\graphicspath{{./images/}}
+
+\usepackage[vlined,ruled]{algorithm2e} % pseudo-code
+
+% \usepackage[document]{ragged2e}  % Left-aligned (whole document)
+% \begin{...} ... \end{...}   flushleft, flushright, center
+
+%%%%%%%%%%%%%%%% CODE %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{minted}         % Code listing
+% \mint{html}|<h2>Something <b>here</b></h2>|
+% \inputminted{octave}{BitXorMatrix.m}
+
+%\begin{listing}[H]
+  %\begin{minted}[xleftmargin=20pt,linenos,bgcolor=codegray]{haskell}
+  %\end{minted}
+  %\caption{Example of a listing.}
+  %\label{lst:example} % You can reference it by \ref{lst:example}
+%\end{listing}
+
+\newcommand{\code}[1]{\texttt{#1}} % Define \code{foo.hs} environment
+
+\newcommand{\pr}[1]{\Pr[#1]}
+
+%%%%%%%%%%%%%%%% COLOURS %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{xcolor}         % Colours \definecolor, \color{codegray}
+\definecolor{codegray}{rgb}{0.9, 0.9, 0.9}
+% \color{codegray} ... ...
+% \textcolor{red}{easily}
+
+%%%%%%%%%%%%%%%% CONFIG %%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\absnamepos}{flushleft}
+\setlength{\absleftindent}{0pt}
+\setlength{\absrightindent}{0pt}
+
+%%%%%%%%%%%%%%%% GLOSSARIES %%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{glossaries}
+
+%\makeglossaries % before entries
+
+%\newglossaryentry{latex}{
+    %name=latex,
+    %description={Is a mark up language specially suited
+    %for scientific documents}
+%}
+
+% Referene to a glossary \gls{latex}
+% Print glossaries \printglossaries
+
+\usepackage[acronym]{glossaries} %
+
+% \acrshort{name}
+% \acrfull{name}
+\newacronym{kcol}{$k$-COL}{$k$-coloring problem}
+\newacronym{scol}{SEARCH-$k$-COL}{Search $k$-coloring problem}
+\newacronym{2col}{$2$-COL}{$2$-coloring problem}
+\newacronym{e2sat}{$E2$-SAT}{Exactly 2-SAT}
+
+%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[displaymath,textmath,sections,graphics,floats]{preview}
+% \PreviewEnvironment{enumerate}
+\PreviewEnvironment{tabular}
+
+%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning}
+
+
+%%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Arnau Abella Gassol}
+\lhead{Randomized Algorithms}
+\rfoot{Page \thepage}
+
+%%%%%%%%%%%%%%%% TITLE %%%%%%%%%%%%%%%%%%%%%
+
+\title{%
+  \vspace{-6em}
+  Randomized Algorithms\\
+  \large{Final Exam}
+}
+\author{%
+  Arnau Abella \\
+  \large{Universitat Polit\`ecnica de Catalunya}
+}
+\date{\today}
+
+%%%%%%%%%%%%%%%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+%\begin{enumerate}[label=(\alph*)]
+%\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Exercise 1}
+\label{sec:1}
+
+\begin{proof}
+  $(X_1, \ldots, X_n)$ are not independent random variables since
+
+  \quad ${}\pr{(X_1 = m) \cap \ldots \cap (X_{n} = m)} \neq \pr{X_{1} = m}\pr{X_{2} = m} \ldots \pr{X_{n} = m}$.
+
+We aim to show that $\pr{M \geq \mu + \gamma}$ is very small for not too big $\gamma$.
+Define $B_{i}$ as a bad event such that $B_{i} \equiv X_{i} \geq \mu + \gamma$ and $M \equiv B = \bigcup_{i = 1}^{n} B_{i}$.
+
+  Let $\pr{B_{i} \equiv X_{i} \geq \mu + \gamma} = \beta$ and ${\pr{M} \leq \sum_{i=1}^{n} \pr{B_{i}} = n\beta}$ (by union bound). We want to show that $\pr{M} \leq \frac{1}{n^{2}} \Rightarrow n\beta = \frac{1}{n^{2}} \Rightarrow \beta = \frac{1}{n^{3}}$. By Chernoff Bounds we get ${\pr{x_{i} \geq \mu + \gamma} = \pr{X \geq (1 + \delta)\mu} \leq e^{-\mu\delta^{2} / 3}}$ where ${\gamma = \delta \mu}$. If $\beta = \frac{1}{n^{3}}$, then $e^{-\mu \delta^{2} / 3} = \frac{1}{n^{3}} \Rightarrow {\delta = 3\sqrt{\ln n}\sqrt{n/m}} \Rightarrow {\gamma = 3\sqrt{\ln n}\sqrt{m/n}}$.
+
+We have shown that the probability of not having a loaded bin is very high $1 - 1/n^{2}$ for not too big ${\gamma = 3\sqrt{\ln n}\sqrt{m/n}}$.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Exercise 2}
+\label{sec:2}
+
+
+\begin{enumerate}[label=(\alph*)]
+  %%%% (a)
+  \item\label{item:2a} \begin{proof}
+
+      The sequence $S = \{S_1, \ldots, S_n\}$ can be generated by coinflipping in the following way: let $c = c_{S_n}, c_{S_{n-1}}, \ldots, c_{S_1}$ be the sequence of coin flips with a biased coin s.t. $\pr{c_{S_i} = H} = \frac{1}{i}$. Let $\#c_{S_i}$ be the number of $c_{S_i}$ flips until $T$. Notice $m_i$ value can be computed in terms of $c_{S_i}$ by $\pr{\#c_j = m_j} = (\frac{1}{j})^{m_j}(1 - \frac{1}{j})$ and the probability of the sequence $(m_1, \ldots, m_n)$ is
+
+    \begin{align*}
+      \pr{(\#c_1 = m_1) \cap \ldots \cap (\#c_n = m_n)} &= \prod_{j = 1}^n \pr{\#c_j = m_j} \\
+      &= \prod_{j = 2}^n (\frac{1}{j})^{m_j}(1 - \frac{1}{j})
+    \end{align*}
+
+  In the second equation we used $\pr{\#c_1 = m_1} = 1$.
+
+  \end{proof}
+
+  %%%% (b)
+\item\label{item:2b} \begin{proof} $r$ can be factored as $\prod_p p^{m_p}$ where $m_p$ is the number of times $p$ is picked in the coinflip. We have shown in \ref{item:2a} that ${\pr{m_j = m_p}} = {(\frac{1}{j})^{m_j}(1 - \frac{1}{j})}$, then the probability of generating $r$ is $\pr{m_j = m_p \ \forall_{p \leq n}} = {\prod_p (\frac{1}{j})^{m_j}(1 - \frac{1}{j})} = \frac{1}{r}\alpha_n$ and the probability of outputing $r$ is $\frac{r}{n}$. Therefore, the probability of producing a randomized integer $r$ is $\frac{\alpha_n}{r} \frac{r}{n} = \frac{\alpha_n}{n}$
+
+  \end{proof}
+
+  %%%% (c)
+\item\label{item:2c} \begin{proof} Let $X_r$ be the number of repetitions to output $r$ (see \ref{item:2b}). Let $X = \sum_r X_r$ be the number of repetitions until the algorithm outputs any $r$. Then, $\pr{(X = n)} = \sum_r \pr{\text{output } r} = n\frac{\alpha_n}{n} = \alpha_n$, $X \sim G(\alpha)$ and $E[X] = \alpha_n^{-1} \sim 1.8 \ln n$.
+
+  \end{proof}
+
+  %%%% (d)
+\item\label{item:2d} \begin{proof} Let $X_i$ be a random indicator where $X_i = 1$ iff $S_i$ is tested for primality, otherwise $0$. Let $X = \sum_{i = 1}^n X_i$ be the random variable that counts the total number of primality tests by one run of the algorithm. Then $E[X] = \sum_{i = 1}^n E[X_i] = \sum_{i=1}^n \frac{1}{i} = H_n$.
+
+  \end{proof}
+
+  %%%% (e)
+  \item\label{item:2e} \begin{proof} We can't multiply the expected number of repetitions by the expected number of primality test by run since these are not independent variables.
+
+      Let $Z = \sum_{i = 1}^{\infty} \sum_{j = 1}^{n} Y_{i,j}$ be the total number of primality tests where
+
+      \begin{equation*}
+        Y_{i,j} = \begin{cases}
+          1  \quad& \text{iff j is tested for primality on i-th iteration} \\
+          0  & \text{otherwise} \\
+        \end{cases}
+      \end{equation*}
+
+    $E[Y_{i,j}] = p_{i,j} = (1 - \alpha_n)^{i-1}/j$ and
+
+    \begin{align*}
+      E[Z] &= \sum_{i = 1}^{\infty} \sum_{j = 1}^{n} E[Y_{i,j}] \\
+           &= \sum_{i = 1}^{\infty} \sum_{j = 1}^{n} \frac{(1 - \alpha_n)^{i-1}}{j} \\
+           &= \sum_{i = 1}^{\infty} (1 - \alpha_n)^{i-1} \sum_{j = 1}^{n} \frac{1}{j} \\
+           &= \alpha_n^{-1} \ H_n
+    \end{align*}
+
+    and $H_n = \Theta(\ln n)$ and $\alpha_n^{-1} = \Theta(\ln n)$ so $H_n / \alpha_n = O(\log^2 n)$
+
+  \end{proof}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Exercise 3}
+\label{sec:3}
+
+\begin{enumerate}[label=(\alph*)]
+  %%%% (a)
+  \item\label{item:3a} \begin{proof} Let $X_i$ be the random indicator where $X_i = 1$ iff vertex $i$ is picked, otherwise $0$. Let $X = \sum_{i = 1}^n X_i$ be the size of $S$. Note, $X \sim Bin(n, 1/4)$ and $E[X] = E[|S|] = n/4$.
+  \end{proof}
+
+  %%%% (b)
+\item\label{item:3b} \begin{proof} Let $X$ be the r.v. that counts the number of edges in $S$. then, ethe expected number of edges in $S$ is $E[X] = \frac{2}{n}(\frac{1}{4})^2 = \frac{n}{8}$.
+
+  \end{proof}
+
+  %%%% (c)
+\item\label{item:3c} \begin{proof} Let $X$ and $Y$ be the number of vertices and edges in $S$, respectively. Let $Z = X - Y$ be the number of vertices in $S'$. Then $E[Z] = E[X - Y] \geq \frac{n}{4} - \frac{n}{8} = \frac{n}{8}$.
+
+  \end{proof}
+
+  %%%% (d)
+\item\label{item:3d} \begin{proof} In \ref{item:3c} we proved that $S'$ is an independent set with at least $\frac{n}{8}$ vertices. There is left to prove that the vertices in $S'$ also form an independent set in $G$. Note, that all vertices in $S$ keep their edges from $G$ and the remaining vertices after the removal of one of the vertices from each removed edge from $S$ must not be connected in $G$. Therefore, these vertices form an independent set in $G$.
+
+  \end{proof}
+
+  %%%% (e)
+  \item\label{item:3e} \begin{proof} Consider the following randomized algorithm.
+
+      \begin{enumerate}[label=\arabic*.]
+        \item Delete vertices of $G$ with probability $\frac{1}{4}$
+        \item For each remaining edge, remove it and one of its adjacent vertices.
+      \end{enumerate}
+
+    The remaining vertices form an independent set (see \ref{item:3d}) of size at least $n/16$ w.h.p. The algorithm runs in polynomic time. The bound of the size is achieve by Chernoff bounds $\pr{Z \leq n/16} \leq e^{-\mu\delta^2 / 2} = e^{-n/64} \Rightarrow \pr{Z > n/16} = 1 - e^{-n/64}$. For example, for $n = 1000$ the $\pr{Z \leq n/16} = 0.000000164$.
+
+  \end{proof}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Exercise 4}
+\label{sec:4}
+
+\begin{enumerate}[label=(\alph*)]
+  %%%% (a)
+  \item\label{item:4a} \begin{proof} Notice that $Q$ is the same graph as $P$ but with less weight on the edges and new added self-transitions on each node. Since $P$ is irreducible, its graph representation is a strongly connected component and $Q$ contains the same strongly connected component $\Rightarrow$ $Q$ is irreducible.
+
+  $Q$ is aperiodic since any MC with finite number of states and at least one self-transition is known to be aperiodic. Alternatively,
+
+    \begin{itemize}
+      \item if $P$ is aperiodic, then $Q$ is aperiodic (just pick the transitions $t, t'$ in $P$ which $gcd(t, t') = 1$).
+      \item If $P$ is not aperiodic, then $\exists t, t' \text{ s.t. } gcd(t, t') > 1$. Define ${t'' = t', p_{i,i}}$ which is the same path as $t'$ with a self-transition at the end. It is easy to see that $gcd(t, t'') = 1$.
+    \end{itemize}
+
+  \end{proof}
+
+  %%%% (b)
+\item\label{item:4b} \begin{proof} The transition matrix $Q$ is \textit{regular} since it is irreducible and aperiodic (see \ref{item:4a}). Regular MC are known to have a \textit{unique stationary distribution}. Let $\pi = (\pi_1, \pi_2, \ldots, \pi_n)$ be the unique stationary distribution of $Q$. Now we show that $\pi$ is also a stationary distribution of $P$. Suppose \textit{w.l.o.g.} that $P, Q$ are square matrix ($n \times n$) with columns of the form
+
+    \begin{align*}
+      C_j &= (a_{1j}, a_{2j}, \ldots, a_{nj})^T \\
+      C'_j &= (\frac{a_{1j}}{2}, \ldots, \frac{1 + a_{jj}}{2}, \ldots, \frac{a_{nj}}{2})^T
+    \end{align*}
+
+  , respectively. Then,
+
+    \begin{align}\label{eq:1}
+      \begin{split}
+      \pi C'_j &= (\pi_1, \pi_2, \ldots, \pi_n) C'_j \\
+               &= (\frac{a_{1j} \pi_1}{2}, \ldots, \frac{(1 + a_{jj}) \pi_j}{2}, \ldots, \frac{a_{nj} \pi_n}{2})^T\\
+               &= \frac{\pi_j}{2} + \frac{\pi}{2}(a_{1j}, \ldots, a_{nj})^T \\
+               &= \frac{\pi_j}{2} + \frac{\pi}{2}C_j \\
+      \end{split}
+    \end{align}
+
+    and
+
+    \begin{align*}
+      \pi_j &= \pi C'_j \\
+            &= \frac{\pi_j}{2} + \frac{\pi}{2}C_j\\
+            &= \pi C_j \\
+    \end{align*}
+
+    In the second equation we used (\ref{eq:1}).
+
+  \end{proof}
+
+
+  %%%% (c)
+  \item\label{item:4c} $Q$ has the same graph representation as $P$ except for
+
+  \begin{enumerate}
+    \item The weights of the edges are halved.
+    \item Each state $S_i$ has a new self-transtion.
+  \end{enumerate}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Exercise 5}
+\label{sec:5}
+
+\begin{enumerate}[label=(\alph*)]
+  %%%% (a)
+  \item\label{item:5a} \begin{proof} The chain is
+
+      \begin{itemize}
+        \item \textbf{regular.} The graph representation of the hypercube has the same edges as the original hypercube plus a self-transition for each state. The hypercube is \textit{irreducible} since it forms a strongly connected component and it is \textit{aperiodic} since it is finite and it has self-transitions. Therefore, since it is irreducible and aperiodic, it is also \textit{regular}.
+
+        \item \textbf{time-reversible.} for all pairs $u, v \in S$, it satisfies the \textit{balance equations} $\pi[u]P_{u,v} = \pi[v]P_{v,u}$ where $P_{u,v} = P_{v,u} = 1/2n$.
+      \end{itemize}
+
+  \end{proof}
+
+  %%%% (b)
+\item\label{item:5b} \begin{proof} To find the stationay distribution we could use the balance equations
+
+  \begin{equation*}
+    \begin{cases}
+      &\frac{\pi[u]}{2n} = \frac{\pi[v]}{2n} = \ldots = \frac{\pi[w]}{2n}\\
+      &\pi[u] + \pi[v] + \ldots + \pi[w] = 1
+    \end{cases}
+  \end{equation*}
+
+  and solve the system of equations to get $\pi[u] = \pi[v] = \ldots = \pi[w] = \frac{1}{2^n}$ but it is easier to notice that the MC is symmetric and all symmetric MC have a unique stationary distribution $\pi[i] = \frac{1}{|S|} \ \forall_{i \in S} = \frac{1}{2^n}$.
+
+  \end{proof}
+
+  %%%% (c)
+\item\label{item:5c} \begin{proof} Let $X_i$ be the number of steps to update a new bit after having updated $i$ bits. Note, $X_i \sim G(\frac{n-i}{2n})$ and $E[X_i] = \frac{2n}{n - i}$.
+
+    Let $X = \sum_{i = 0}^{n} X_i$ be the number of steps to update at least once each one of the $n$ bits. Then,
+
+    \begin{align*}
+      E[X] &\leq \sum_{i = 0}^{n} E[X_i] \\
+           &= \sum_{i = 0}^{n} \frac{2n}{n-i} \\
+           &= 2n \sum_{i = 0}^{n} \frac{1}{i} \\
+           &= 2n \ H_n \\
+           &= O(n \log n)
+    \end{align*}
+  \end{proof}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
